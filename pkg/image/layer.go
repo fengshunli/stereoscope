@@ -3,6 +3,7 @@ package image
 import (
 	"archive/tar"
 	"fmt"
+	"github.com/gabriel-vasile/mimetype"
 	"io"
 	"os"
 	"path"
@@ -120,7 +121,17 @@ func (l *Layer) indexer(monitor *progress.Manual) file.TarIndexVisitor {
 	return func(index file.TarIndexEntry) error {
 		var err error
 		var entry = index.ToTarFileEntry()
-		metadata := file.NewMetadata(entry.Header, entry.Sequence)
+
+		// attempt to extract the mimetype from the contents
+		var contents = index.Open()
+		var mTypeStr string
+		mType, err := mimetype.DetectReader(contents)
+		if err == nil {
+			mTypeStr = mType.String()
+		}
+		contents.Close()
+
+		metadata := file.NewMetadata(entry.Header, entry.Sequence, mTypeStr)
 
 		// note: the tar header name is independent of surrounding structure, for example, there may be a tar header entry
 		// for /some/path/to/file.txt without any entries to constituent paths (/some, /some/path, /some/path/to ).

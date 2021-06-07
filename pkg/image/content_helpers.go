@@ -25,3 +25,21 @@ func fetchFileContentsByPath(ft *filetree.FileTree, fileCatalog *FileCatalog, pa
 	}
 	return reader, nil
 }
+
+// fetchFileContentsByPath is a common helper function for resolving the file contents for a path from the file
+// catalog relative to the given tree.
+func fetchFilesByMIMEType(ft *filetree.FileTree, fileCatalog *FileCatalog, mType string) ([]file.Reference, error) {
+	exists, fileReference, err := ft.File(path, filetree.FollowBasenameLinks)
+	if err != nil {
+		return nil, err
+	}
+	if !exists && fileReference == nil {
+		return nil, fmt.Errorf("could not find file path in Tree: %s", path)
+	}
+
+	reader, err := fileCatalog.FileContents(*fileReference)
+	if err != nil {
+		return nil, err
+	}
+	return reader, nil
+}

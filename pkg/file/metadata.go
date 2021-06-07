@@ -24,9 +24,10 @@ type Metadata struct {
 	TypeFlag byte
 	IsDir    bool
 	Mode     os.FileMode
+	MIMEType string
 }
 
-func NewMetadata(header tar.Header, sequence int64) Metadata {
+func NewMetadata(header tar.Header, sequence int64, mimeType string) Metadata {
 	return Metadata{
 		Path:          path.Clean(DirSeparator + header.Name),
 		TarHeaderName: header.Name,
@@ -38,5 +39,6 @@ func NewMetadata(header tar.Header, sequence int64) Metadata {
 		UserID:        header.Uid,
 		GroupID:       header.Gid,
 		IsDir:         header.FileInfo().IsDir(),
+		MIMEType:      mimeType,
 	}
 }

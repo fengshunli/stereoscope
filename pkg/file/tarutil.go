@@ -104,7 +104,14 @@ func MetadataFromTar(reader io.ReadCloser, tarPath string) (Metadata, error) {
 	var metadata *Metadata
 	visitor := func(entry TarFileEntry) error {
 		if entry.Header.Name == tarPath {
-			m := NewMetadata(entry.Header, entry.Sequence)
+			// attempt to extract the mimetype from the contents
+			//var mTypeStr string
+			//mType, err := mimetype.DetectReader(reader)
+			//if err == nil {
+			//	mTypeStr = mType.String()
+			//}
+
+			m := NewMetadata(entry.Header, entry.Sequence, "")
 			metadata = &m
 			return ErrTarStopIteration
 		}
